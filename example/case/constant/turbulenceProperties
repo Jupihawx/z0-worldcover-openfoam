@@ -1,0 +1,21 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      turbulenceProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Neutral comparison run: standard k-epsilon (= buoyantKEpsilon without the buoyancy term),
+// default coefficients, so the only difference to Heat_Example is the heat.
+
+simulationType RAS;
+
+RAS
+{
+    RASModel            kEpsilon;
+    turbulence          on;
+    printCoeffs         on;
+    kMin                1e-3;
+}
+// ************************************************************************* //

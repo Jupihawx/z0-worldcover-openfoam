@@ -1,0 +1,18 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvOptions;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Cap U during the start-up transient: near-closed pockets between buildings blow up
+// in the first iterations on the canopy mesh. Should report "damped 0" once settled.
+limitU
+{
+    type            velocityDampingConstraint;
+    selectionMode   all;
+    UMax            20;
+}
+// ************************************************************************* //

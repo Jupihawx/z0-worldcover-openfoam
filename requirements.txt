@@ -1,0 +1,10 @@
+# make_z0.py, tools/z0_faces.py, tools/decompose_z0.py
+numpy
+scipy
+matplotlib
+rasterio
+pyproj
+# tools/check_wall_lists.py
+pyvista
+# example/clean_stl.py
+trimesh

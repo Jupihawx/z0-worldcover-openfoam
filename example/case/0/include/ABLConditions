@@ -1,0 +1,34 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  Atmospheric boundary layer inflow, OpenFOAM v2412 (openfoam.com), atmosphericModels
+\*---------------------------------------------------------------------------*/
+// Example inflow (illustrative, not a measured day): 5 m/s at 100 m from the south-west,
+// the prevailing wind direction in the western Netherlands.
+// For a real day, take Uref and dirFrom from ERA5 (100 m wind) or a station.
+Uref                 5.0;		// Wind speed at Zref in m/s
+Zref                 100.0;		// Reference height in m (ERA5 100 m wind)
+dirFrom              225.0;		// Direction the wind blows FROM, deg clockwise from North (mesh y = North)
+zDir                 (0 0 1);
+
+// Inlet roughness: the ONLY z0 used for the inlet U, k, epsilon and the initial field.
+// One value per site (or per direction sector from geo/inlet_z0_sectors.csv, see README "Inlet roughness").
+z0In                 0.1;		// m, from geo/inlet_z0_sectors.csv: 225 deg sector log-mean 0.11 m
+z0Buildings          0.05;		// Facade roughness, m (rough wall functions on Buildings)
+// Ground roughness: per-face list constant/wallLists/Terrain.z0 (tools/z0_faces.py), see 0/nut
+d                    uniform 0.0;	// Displacement height
+
+kappa                0.41;
+Cmu                  0.09;
+
+/*				DERIVED, do not edit				    */
+z0                   uniform $z0In;
+dirRad               #calc "degToRad($dirFrom)";
+compX                #calc "-Foam::sin(scalar($dirRad))";	// blowing TOWARDS = from + 180
+compY                #calc "-Foam::cos(scalar($dirRad))";
+flowDir              ($compX $compY 0);
+uStar                #calc "( $Uref * $kappa ) / log(( $Zref + $z0In ) / $z0In )";
+kInlet               #calc "( $uStar * $uStar ) / sqrt( $Cmu )";
+epsilonInlet         #calc "pow($uStar, 3) / ( $kappa * ( $Zref + $z0In ))";
+UX                   #calc "$Uref * $compX";
+UY                   #calc "$Uref * $compY";
+Uvector              ($UX $UY 0);
+// ************************************************************************* //
