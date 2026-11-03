@@ -1,5 +1,7 @@
 # z0-worldcover-openfoam
 
+![z0 per ground face from ESA WorldCover, TU Delft example](docs/images/z0_ground_3d.png)
+
 Ground roughness **z0** for OpenFOAM atmospheric boundary layer (ABL) cases, taken from the
 **ESA WorldCover 2021** land-cover map (10 m). Each ground face gets the z0 of the land under it:
 trees, grass, water and built-up areas each have their own value, and buildings that are already
@@ -79,7 +81,11 @@ python3 <repo>/tools/z0_faces.py . --patch Terrain      # -> constant/wallLists/
 ```
 
 Check `geo/z0_map_zoom.png` (the building roofs must sit on red built-up pixels; parks, canals and
-lakes must line up), then set the wall functions:
+lakes must line up):
+
+![Alignment check: land cover and z0 with the building roofs on top](docs/images/z0_map.png)
+
+Then set the wall functions:
 
 ```
 // 0/nut
@@ -192,6 +198,8 @@ Example (TU Delft, 855 k cells, 127 k ground faces, 8 ranks): `make_z0.py` with 
 `example/` is a real site (~1.3 km of TU Delft campus and housing from OpenStreetMap, 855 k cells) that
 runs end to end in about 6.5 minutes on a desktop: see [`example/README.md`](example/README.md). The same case is
 the example of the solar repository.
+
+![Wind speed 10 m above ground, neutral simpleFoam run, wind from the south-west](docs/images/wind_10m.png)
 
 ## Limitations
 
