@@ -11,7 +11,7 @@ patch the value of the nearest map point (vertex-mean face centre) and writes
 
 for  z0  #include "$FOAM_CASE/constant/wallLists/<patch>.z0";  in 0/nut and 0/epsilon.
 Rerun after every remesh (the list belongs to one mesh). In parallel, run tools/decompose_z0.py
-after decomposePar: OpenFOAM v2412 decomposePar does not split this list (docs/pitfalls.md).
+after decomposePar: OpenFOAM v2412 decomposePar does not split this list (README).
 """
 import argparse
 import re

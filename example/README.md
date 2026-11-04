@@ -6,7 +6,7 @@ trees, lawns and canals, so z0 varies from 0.0002 m to 1.5 m.
 
 | | |
 |---|---|
-| Geometry | `geo/Buildings.stl`, shipped: OSM buildings imported with Blender + Blosm (extent lon 4.36745–4.38655, lat 51.99439–52.00726), some removed by hand, then `../clean_stl.py` (solids under 25 m² footprint and broken triangles removed). 406 solids, tallest 90 m (EWI) |
+| Geometry | `geo/Buildings.stl`, shipped: OSM buildings (extent lon 4.36745–4.38655, lat 51.99439–52.00726), cleaned (small sheds and broken triangles removed). 406 solids, tallest 90 m (EWI) |
 | Domain | box aligned with the wind: buildings within 1000 m of the origin, plus 300 m upstream and to the sides, 900 m downstream, 300 m high. **Smaller than the COST 732 guideline** (5 H / 15 H / 6 H with H = 90 m) to keep the example short |
 | Mesh | blockMesh 20 m cells, rotated to `dirFrom` with `transformPoints`. snappyHexMesh: the whole ground at 10 m (first cell 10 m tall everywhere, no refinement boxes), 5 m within 10 m of buildings, 2.5 m on building surfaces |
 | Inflow | 5 m/s at 100 m from 225° (south-west), illustrative, not a measured day. `z0In` 0.1 m from `geo/inlet_z0_sectors.csv` (225° sector: 0.11 m) |
@@ -17,25 +17,19 @@ trees, lawns and canals, so z0 varies from 0.0002 m to 1.5 m.
 
 Linux or WSL2 (Ubuntu). Commands start in the repository root.
 
-**1. OpenFOAM v2412 (openfoam.com).** Install it from <https://develop.openfoam.com/Development/openfoam/-/wikis/precompiled>
+**1. OpenFOAM (openfoam.com; tested with v2412 and v2606).** Install it from <https://develop.openfoam.com/Development/openfoam/-/wikis/precompiled>
 (Ubuntu: `apt` package `openfoam2412-default`), then load it in every new shell:
 
 ```bash
 source /usr/lib/openfoam/openfoam2412/etc/bashrc
-simpleFoam -help > /dev/null && echo OK          # check
 ```
 
-`mpirun` comes with the OpenFOAM package; nothing else is needed on the OpenFOAM side.
-
-**2. Python environment** (Python ≥ 3.10) with the repository's `requirements.txt`:
+**2. Python environment:**
 
 ```bash
 python3 -m venv ~/venvs/z0
 ~/venvs/z0/bin/python -m pip install -r requirements.txt
 ```
-
-If `python3 -m venv` is missing: `sudo apt install python3-venv`. Alternatively with uv:
-`uv venv --python 3.12 ~/venvs/z0 && uv pip install --python ~/venvs/z0 -r requirements.txt`.
 
 **3. Run the example** (internet needed on the first run: one 55 MB WorldCover tile):
 
@@ -93,11 +87,10 @@ and the z0 list must be regenerated for the new mesh (`Allrun.sh` does both).
 
 ## Your own site
 
-1. Blender + Blosm: import OSM buildings (terrain off), clean them up without moving anything, and note
-   the scene origin (`C.scene["lat"], C.scene["lon"]`). Export STL: selection only, binary, scale 1,
-   Forward Y, Up Z.
-2. `python ../clean_stl.py export.stl case/geo/Buildings.stl --min-area 25`
-3. Put the origin in `geo/site.json`, set `Rb` (radius of the building area) and the margins in
+1. A building STL in metres, z up, ground at z = 0, x = east and y = north from a known origin
+   (Transverse Mercator centred on that lat/lon). Remove buildings smaller than the mesh resolution;
+   they only make slivers.
+2. Put the origin in `geo/site.json`, set `Rb` (radius of the building area) and the margins in
    `system/blockMeshDict`, and a `locationInMesh` above the buildings in `system/snappyHexMeshDict`.
 
 ## Licence of the geometry

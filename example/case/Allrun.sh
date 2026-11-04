@@ -1,6 +1,6 @@
 #!/bin/bash
-# TU Delft example, neutral ABL (simpleFoam, OpenFOAM v2412 openfoam.com):
-#   geo/Buildings.stl (OSM via Blender + Blosm) -> blockMesh + snappyHexMesh -> z0 from ESA WorldCover
+# TU Delft example, neutral ABL (simpleFoam, OpenFOAM openfoam.com, tested v2412/v2606):
+#   geo/Buildings.stl (OSM buildings) -> blockMesh + snappyHexMesh -> z0 from ESA WorldCover
 #   -> per-face z0 list -> solve
 #
 # Usage:  bash Allrun.sh            (from anywhere; source OpenFOAM's etc/bashrc first)
@@ -30,7 +30,7 @@ snappyHexMesh -overwrite > logs/snappyHexMesh.log
 checkMesh > logs/checkMesh.log || echo "checkMesh reported problems, see logs/checkMesh.log"
 
 # 3. z0 (and albedo, sensibleFraction) from WorldCover -> constant/boundaryData/Terrain, geo/*.png
-#    --radius: the rotated box reaches ~2300 m from the centre (blockMesh.log has the unrotated box)
+#    --radius: the rotated box reaches ~2300 m from the origin
 $PY "$REPO/make_z0.py" --case . --lat0 "$LAT0" --lon0 "$LON0" --dx 10 --radius 2400 | tee logs/make_z0.log
 #    per-face list in polyMesh order -> constant/wallLists/Terrain.z0 (read by 0/nut and 0/epsilon)
 $PY "$REPO/tools/z0_faces.py" . --patch Terrain | tee logs/z0_faces.log

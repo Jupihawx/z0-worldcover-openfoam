@@ -8,17 +8,15 @@ Writes, inside the case:
   geo/inlet_z0_sectors.csv               log-mean z0 of the upstream fetch per inflow direction (for z0In)
 
 Mesh coordinates must be a Transverse Mercator centred on (lat0, lon0), x = east, y = north, metres, z up,
-ground at z = 0: what Blosm exports (Blender scene lat/lon).
+ground at z = 0.
 See README.md.
 
 Usage:
-  python make_z0.py --case <case> --lat0 <scene lat> --lon0 <scene lon> [options]
+  python make_z0.py --case <case> --lat0 <lat> --lon0 <lon> --radius <m> [options]
 """
 import argparse
 import math
 import os
-import re
-import sys
 import urllib.request
 import numpy as np
 import rasterio
@@ -68,12 +66,12 @@ URL = "https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/2021/map/{}"
 
 ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
 ap.add_argument("--case", default=".", help="OpenFOAM case directory")
-ap.add_argument("--lat0", type=float, required=True, help="projection origin latitude  (Blosm: C.scene['lat'])")
-ap.add_argument("--lon0", type=float, required=True, help="projection origin longitude (Blosm: C.scene['lon'])")
+ap.add_argument("--lat0", type=float, required=True, help="projection origin latitude")
+ap.add_argument("--lon0", type=float, required=True, help="projection origin longitude")
 ap.add_argument("--stl", default="geo/Buildings.stl", help="explicit buildings, relative to case")
 ap.add_argument("--patch", default="Terrain", help="ground patch name")
-ap.add_argument("--radius", type=float, default=None,
-                help="half-size of sampled area, m (default: blockMesh boundingBox from logs/blockMesh.log + 5%%)")
+ap.add_argument("--radius", type=float, required=True,
+                help="half-size of the sampled area, m: at least the farthest ground point from the origin")
 ap.add_argument("--dx", type=float, default=20.0, help="sample spacing, m")
 ap.add_argument("--explicit-dist", type=float, default=50.0,
                 help="built-up pixels closer than this to an explicit building get --z0-explicit")
@@ -83,16 +81,6 @@ ap.add_argument("--sectors", type=int, default=32, help="number of inflow sector
 ap.add_argument("--tile-dir", default=os.path.expanduser("~/worldcover"), help="WorldCover tile cache")
 a = ap.parse_args()
 os.chdir(a.case)
-
-# ---- domain size
-if a.radius is None:
-    try:
-        txt = open(os.path.join("logs", "blockMesh.log")).read()
-        lo, hi = re.findall(r"boundingBox: \(([^)]*)\) \(([^)]*)\)", txt)[-1]
-        lo, hi = np.array(lo.split(), float), np.array(hi.split(), float)
-        a.radius = 1.05 * max(np.abs(lo[:2]).max(), np.abs(hi[:2]).max())
-    except (OSError, IndexError):
-        sys.exit("No logs/blockMesh.log with a boundingBox: run blockMesh first or pass --radius")
 
 to_ll = Transformer.from_crs(f"+proj=tmerc +lat_0={a.lat0} +lon_0={a.lon0} +k=1 +x_0=0 +y_0=0 +datum=WGS84",
                              "EPSG:4326", always_xy=True)

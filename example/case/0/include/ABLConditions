@@ -1,5 +1,5 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-  Atmospheric boundary layer inflow, OpenFOAM v2412 (openfoam.com), atmosphericModels
+  Atmospheric boundary layer inflow, OpenFOAM (openfoam.com), atmosphericModels
 \*---------------------------------------------------------------------------*/
 // Example inflow (illustrative, not a measured day): 5 m/s at 100 m from the south-west,
 // the prevailing wind direction in the western Netherlands.
