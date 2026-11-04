@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/images/logo.png" width="280" alt="z0-worldcover-openfoam logo"></p>
+<p align="center"><img src="docs/images/logo.png" width="480" alt="z0-worldcover-openfoam logo"></p>
 
 # z0-worldcover-openfoam
 
